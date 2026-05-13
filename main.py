@@ -67,7 +67,7 @@ def main():
     plt.scatter(trajectory_x[0], trajectory_y[0],
                 color='green', s=60, label="Старт", zorder=6)
 
-    plt.title("Симуляция 2D Ray Tracing (Математический бильярд)")
+    plt.title("Симуляция 2D Ray Tracing")
     plt.grid(True, linestyle='--', alpha=0.6)
     plt.legend()
     plt.axis('equal')
