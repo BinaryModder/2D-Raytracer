@@ -8,7 +8,7 @@ class RayTracingLab:
 
     def __init__(self, root):
         self.root = root
-        self.root.title("Мини-лаборатория: 2D Ray Tracing")
+        self.root.title("Laboratory of 2D-Ray simulation")
 
         self.width = 600
         self.height = 400
@@ -22,7 +22,7 @@ class RayTracingLab:
         self.main_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
         self.canvas = tk.Canvas(self.main_container, width=self.width,
-                                height=self.height, bg='#f0f0f0', cursor="crosshair")
+                                height=self.height, bg='#f0f0f0', cursor="crosshair", highlightthickness=1, highlightbackground="black")
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
         self.canvas.bind("<Button-1>", self.on_click)
@@ -34,19 +34,19 @@ class RayTracingLab:
 
         button_width = 20
 
-        self.btn_close = tk.Button(btn_frame, text="Замкнуть контур", command=self.close_room,
+        self.btn_close = tk.Button(btn_frame, text="Close loop", command=self.close_room,
                                    state=tk.DISABLED, width=button_width)
         self.btn_close.grid(row=0, column=0, pady=5)
 
-        self.btn_ray = tk.Button(btn_frame, text="Указать луч",
+        self.btn_ray = tk.Button(btn_frame, text="Specify beam", command=self.configure_ray_state,
                                  state=tk.DISABLED, width=button_width)
         self.btn_ray.grid(row=1, column=0, pady=5)
 
-        self.btn_run = tk.Button(btn_frame, text="Рассчитать", command=self.run_simulation,
+        self.btn_run = tk.Button(btn_frame, text="Calculate", command=self.run_simulation,
                                  state=tk.DISABLED, bg='lightblue', width=button_width)
         self.btn_run.grid(row=2, column=0, pady=5)
 
-        self.btn_clear = tk.Button(btn_frame, text="Очистить всё", command=self.clear_all,
+        self.btn_clear = tk.Button(btn_frame, text="Clean all", command=self.clear_all,
                                    width=button_width)
         self.btn_clear.grid(row=3, column=0, pady=5)
 
@@ -84,9 +84,16 @@ class RayTracingLab:
 
     def on_release(self, event):
         if self.mode == "DRAW_RAY" and self.ray_start:
+
             self.ray_end = Vector2D(event.x, self.height - event.y)
             self.mode = "DONE"
             self.btn_run.config(state=tk.NORMAL)
+
+            self.btn_ray.config(text="Replace ray")
+
+    def configure_ray_state(self):
+        if self.mode == "DONE":
+            self.mode = "DRAW_RAY"
 
     def close_room(self):
         if len(self.room_points) >= 3:
@@ -106,6 +113,7 @@ class RayTracingLab:
         self.ray_start = None
         self.ray_end = None
         self.mode = "DRAW_ROOM"
+
         self.btn_close.config(state=tk.DISABLED)
         self.btn_run.config(state=tk.DISABLED)
         self.btn_ray.config(state=tk.DISABLED)
@@ -113,7 +121,7 @@ class RayTracingLab:
     def run_simulation(self):
         if len(self.room_points) < 3 or not self.ray_start or not self.ray_end:
             messagebox.showwarning(
-                "Ошибка", "Сначала нарисуйте комнату и укажите луч!")
+                "Error", "First, you should draw a room , then - ray")
             return
 
         walls = []
@@ -124,7 +132,7 @@ class RayTracingLab:
 
         direction = self.ray_end - self.ray_start
         if direction.x == 0 and direction.y == 0:
-            messagebox.showwarning("Ошибка", "Вектор луча слишком короткий!")
+            messagebox.showwarning("Error", "Vector of ray too short!")
             return
 
         current_ray = Ray(self.ray_start, direction)
@@ -165,14 +173,14 @@ class RayTracingLab:
         room_x = [p.x for p in self.room_points] + [self.room_points[0].x]
         room_y = [p.y for p in self.room_points] + [self.room_points[0].y]
 
-        plt.plot(room_x, room_y, 'k-', linewidth=3, label="Контур")
+        plt.plot(room_x, room_y, 'k-', linewidth=3, label="Circuit")
         plt.plot(trajectory_x, trajectory_y, 'r-',
-                 linewidth=1.5, alpha=0.8, label="Траектория")
+                 linewidth=1.5, alpha=0.8, label="Trajectory")
         plt.scatter(trajectory_x, trajectory_y, color='blue', s=20, zorder=5)
         plt.scatter(trajectory_x[0], trajectory_y[0],
-                    color='green', s=60, label="Старт", zorder=6)
+                    color='green', s=60, label="Start point", zorder=6)
 
-        plt.title("Результат симуляции: Matplotlib")
+        plt.title("Result of simulation :) ")
         plt.grid(True, linestyle='--', alpha=0.6)
         plt.legend()
         plt.axis('equal')
