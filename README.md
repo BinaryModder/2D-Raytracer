@@ -1,1 +1,1 @@
-Программная симуляция трассировки лучей в двумерном пространстве
+Here you could simulate 2d ray in different figures : )
